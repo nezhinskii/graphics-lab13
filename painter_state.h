@@ -6,6 +6,6 @@ class PainterState {
 public:
 	PainterState(Camera camera) : camera(camera)
 	{}
-
+	std::string path = "";
 	Camera camera;
 };

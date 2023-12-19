@@ -13,12 +13,38 @@
 #include <iostream>
 #include "camera.h"
 #include "painter.h"
-#include "painter_state.h";s
+#include "lib/ImGuiFileDialog/ImGuiFileDialog.h"
+#include "painter_state.h"
 
 using namespace sf;
 
+void modelPickerWidget(std::string title, std::string* path, Painter* painter, int ind) {
+	if (ImGui::Button(title.c_str()))
+		ImGuiFileDialog::Instance()->OpenDialog(title.c_str(), "Choose object", ".obj", ".");
+	if ((*path).empty()) {
+		ImGui::Text("Empty");
+	}
+	else {
+		ImGui::Text((*path).c_str());
+	}
+
+	if (ImGuiFileDialog::Instance()->Display(title.c_str()))
+	{
+		if (ImGuiFileDialog::Instance()->IsOk())
+		{
+			std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+			(*path) = filePathName;
+			(*painter).loadModel(filePathName);
+		}
+		else {
+			(*path).clear();
+		}
+		ImGuiFileDialog::Instance()->Close();
+	}
+}
+
 int main() {
-	sf::RenderWindow window(sf::VideoMode(600, 600), "My OpenGL window", sf::Style::Default, sf::ContextSettings(24));
+	sf::RenderWindow window(sf::VideoMode(600, 600), "Lab 13", sf::Style::Default, sf::ContextSettings(24));
 	window.setFramerateLimit(60);
 	window.setVerticalSyncEnabled(true);
 	window.setActive(true);
@@ -33,11 +59,18 @@ int main() {
 	sf::Clock clock;
 	GLboolean isFocused = false;
 	sf::Vector2i centerWindow;
+
+	if (!ImGui::SFML::Init(window)) return -1;
+
+	sf::Clock deltaClock;
 	while (window.isOpen()) {
 
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
+			ImGui::SFML::ProcessEvent(window, event);
+			bool isImGuiHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow);
+
 			if (event.type == sf::Event::Closed)
 				window.close();
 			else if (event.type == sf::Event::Resized) {
@@ -61,7 +94,7 @@ int main() {
 				painter.state.camera.processMouseMovement(xoffset, yoffset);
 			}
 
-			if (event.type == sf::Event::MouseButtonPressed) {
+			if (!isImGuiHovered && event.type == sf::Event::MouseButtonPressed) {
 				isFocused = true;
 				window.setMouseCursorVisible(false);
 				window.setMouseCursorGrabbed(true);
@@ -76,12 +109,21 @@ int main() {
 				isFocused = false;
 				firstMouse = true;
 			}
-
 		}
+
+		ImGui::SFML::Update(window, deltaClock.restart());
+
+
+		ImGui::Begin("Lab 13");
+		modelPickerWidget("Pick model", &painter.state.path, &painter, 0);
+
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		//window.clear(sf::Color(100, 100, 100, 255));
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		painter.Draw();
+
+		ImGui::End();
+		ImGui::SFML::Render(window);
 		window.display();
 	}
 

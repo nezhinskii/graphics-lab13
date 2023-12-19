@@ -127,10 +127,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="lib\ImGuiFileDialog\ImGuiFileDialog.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
+    <ClInclude Include="lib\ImGuiFileDialog\ImGuiFileDialog.h" />
+    <ClInclude Include="lib\stb_image.h" />
     <ClInclude Include="painter.h" />
     <ClInclude Include="painter_state.h" />
   </ItemGroup>
