@@ -248,6 +248,7 @@ class Painter {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
+	std::vector<GLuint> indices;
 public:
 	Painter(PainterState& painterState) : state(painterState) {}
 
@@ -256,6 +257,7 @@ public:
 	GLfloat angle = 0.0f;
 
 	void loadModel(const std::string& path) {
+
 		numTextures = 0;
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
@@ -271,6 +273,7 @@ public:
 		modelDirectory = modelDirectory.substr(0, modelDirectory.find_last_of('\\'));
 
 		for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
+
 
 			aiMesh* mesh = scene->mMeshes[i];
 
@@ -296,13 +299,26 @@ public:
 
 			glBindVertexArray(VAO);
 
+			for (unsigned int j = 0; j < mesh->mNumFaces; ++j) {
+				aiFace face = mesh->mFaces[j];
+
+				for (unsigned int k = 0; k < face.mNumIndices; ++k) {
+					indices.push_back(face.mIndices[k]);
+				}
+			}
+
+			GLuint EBO;
+			glGenBuffers(1, &EBO);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+
 			glBindBuffer(GL_ARRAY_BUFFER, VBO);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(aiVector3D) * mesh->mNumVertices, &mesh->mVertices[0], GL_STATIC_DRAW);
 
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 			glEnableVertexAttribArray(0);
 
-			/*if (mesh->HasTextureCoords(0)) {
+			if (mesh->HasTextureCoords(0)) {
 				GLuint textureVBO;
 				glGenBuffers(1, &textureVBO);
 				glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
@@ -310,7 +326,7 @@ public:
 
 				glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 				glEnableVertexAttribArray(1);
-			}*/
+			}
 
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -343,7 +359,8 @@ public:
 		glUniformMatrix4fv(glGetUniformLocation(Programs[0], "view"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
 		glUniformMatrix4fv(glGetUniformLocation(Programs[0], "projection"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
-		glDrawArrays(GL_TRIANGLES, 0, numVertices);
+
+		glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
 		glUseProgram(0);

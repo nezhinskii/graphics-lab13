@@ -19,7 +19,7 @@ public:
         fov(45),
         aspectRatio(aspectRatio),
         nearPlane(0.1f),
-        farPlane(100.0f)
+        farPlane(1000.0f)
     {
         updateCameraVectors();
     }
