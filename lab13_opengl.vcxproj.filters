@@ -38,6 +38,9 @@
     <ClInclude Include="lib\stb_image.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="model.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

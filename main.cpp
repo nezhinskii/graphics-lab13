@@ -18,7 +18,7 @@
 
 using namespace sf;
 
-void modelPickerWidget(std::string title, std::string* path, Painter* painter, int ind) {
+void modelPickerWidget(std::string title, std::string* path, Model*& model) {
 	if (ImGui::Button(title.c_str()))
 		ImGuiFileDialog::Instance()->OpenDialog(title.c_str(), "Choose object", ".obj", ".");
 	if ((*path).empty()) {
@@ -34,7 +34,7 @@ void modelPickerWidget(std::string title, std::string* path, Painter* painter, i
 		{
 			std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
 			(*path) = filePathName;
-			(*painter).loadModel(filePathName);
+			model = new Model(filePathName);
 		}
 		else {
 			(*path).clear();
@@ -115,10 +115,10 @@ int main() {
 
 
 		ImGui::Begin("Lab 13");
-		modelPickerWidget("Pick model", &painter.state.path, &painter, 0);
+		modelPickerWidget("Pick central model", &painter.state.centralPath, painter.state.centralModel);
+		modelPickerWidget("Pick satellite model", &painter.state.satellitePath, painter.state.satelliteModel);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		//window.clear(sf::Color(100, 100, 100, 255));
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		painter.Draw();
 

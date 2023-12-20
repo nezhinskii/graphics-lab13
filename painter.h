@@ -16,39 +16,12 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "lib/stb_image.h";
 
 using namespace sf;
 
 class Painter {
 
-	struct MyTexCoord {
-		GLfloat x;
-		GLfloat y;
-	};
-
-	struct MyVertex {
-		GLfloat x;
-		GLfloat y;
-		GLfloat z;
-	};
-
-	struct MyColor {
-		GLfloat r;
-		GLfloat g;
-		GLfloat b;
-		GLfloat a;
-	};
-
-
 	GLuint Programs[1];
-
-	GLuint VBO, VAO;
-
-	GLuint numVertices;
-
-	GLuint textures[20];
-	GLuint numTextures = 0;
 
 	const static GLuint shadersNumber = 1;
 
@@ -80,15 +53,43 @@ class Painter {
 
 		out vec4 fragColor;
 
-		uniform sampler2D textures[20];
+		uniform sampler2D textures0;
+		uniform sampler2D textures1;
+		uniform sampler2D textures2;
+		uniform sampler2D textures3;
+		uniform sampler2D textures4;
+		uniform sampler2D textures5;
+		uniform sampler2D textures6;
+		uniform sampler2D textures7;
+
 		uniform int numTextures;
 
 		void main() {
 			vec4 finalColor = vec4(1.0);
-
-			for (int i = 0; i < numTextures; ++i) {
-				vec4 textureColor = texture(textures[i], textureCoord);
-				finalColor *= textureColor;
+			
+			if (numTextures > 0){
+				finalColor *= texture(textures0, textureCoord);
+			}
+			if (numTextures > 1){
+				finalColor *= texture(textures1, textureCoord);
+			}
+			if (numTextures > 2){
+				finalColor *= texture(textures2, textureCoord);
+			}
+			if (numTextures > 3){
+				finalColor *= texture(textures3, textureCoord);
+			}
+			if (numTextures > 4){
+				finalColor *= texture(textures4, textureCoord);
+			}
+			if (numTextures > 5){
+				finalColor *= texture(textures5, textureCoord);
+			}
+			if (numTextures > 6){
+				finalColor *= texture(textures6, textureCoord);
+			}
+			if (numTextures > 7){
+				finalColor *= texture(textures7, textureCoord);
 			}
 
 			fragColor = finalColor;
@@ -108,74 +109,6 @@ class Painter {
 			glGetShaderInfoLog(shader, infologLen, &charsWritten, infoLog.data());
 			std::cout << "InfoLog: " << infoLog.data() << std::endl;
 		}
-	}
-
-
-	void InitVBO() {
-		srand(time(0));
-		InitCube();
-	}
-
-	void InitCube() {
-		numVertices = 36;
-		GLfloat cube[] = {
-			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
-			 0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
-			 0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 1.0f,   1.0f, 1.0f,
-			 0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 1.0f,   1.0f, 1.0f,
-			-0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 1.0f, 1.0f,   0.0f, 1.0f,
-			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
-
-			-0.5f, -0.5f,  0.5f,  0.0f, 1.0f, 1.0f, 1.0f,   0.0f, 0.0f,
-			 0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 0.0f, 1.0f,   1.0f, 0.0f,
-			 0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 1.0f,
-			 0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 1.0f,
-			-0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f, 1.0f,   0.0f, 1.0f,
-			-0.5f, -0.5f,  0.5f,  0.0f, 1.0f, 1.0f, 1.0f,   0.0f, 0.0f,
-
-			-0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f, 1.0f,   1.0f, 0.0f,
-			-0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 1.0f, 1.0f,   1.0f, 1.0f,
-			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 1.0f,   0.0f, 1.0f,
-			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 1.0f,   0.0f, 1.0f,
-			-0.5f, -0.5f,  0.5f,  0.0f, 1.0f, 1.0f, 1.0f,   0.0f, 0.0f,
-			-0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f, 1.0f,   1.0f, 0.0f,
-
-			 0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 0.0f,
-			 0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 1.0f,   1.0f, 1.0f,
-			 0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f, 1.0f,   0.0f, 1.0f,
-			 0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f, 1.0f,   0.0f, 1.0f,
-			 0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 0.0f, 1.0f,   0.0f, 0.0f,
-			 0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 0.0f,
-
-			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 1.0f,   0.0f, 1.0f,
-			 0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
-			 0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 0.0f, 1.0f,   1.0f, 0.0f,
-			 0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 0.0f, 1.0f,   1.0f, 0.0f,
-			-0.5f, -0.5f,  0.5f,  0.0f, 1.0f, 1.0f, 1.0f,   0.0f, 0.0f,
-			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 1.0f,   0.0f, 1.0f,
-
-			-0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 1.0f, 1.0f,   0.0f, 1.0f,
-			 0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 1.0f,   1.0f, 1.0f,
-			 0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 0.0f,
-			 0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 0.0f,
-			-0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f, 1.0f,   0.0f, 0.0f,
-			-0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 1.0f, 1.0f,   0.0f, 1.0f
-		};
-
-
-		//GLuint VBO;
-		glGenVertexArrays(1, &VAO);
-		glBindVertexArray(VAO);
-		glGenBuffers(1, &VBO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-
-		glBufferData(GL_ARRAY_BUFFER, sizeof(cube), cube, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)0);
-		glEnableVertexAttribArray(0);
-
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(1);
 	}
 
 	void InitShader() {
@@ -222,146 +155,47 @@ class Painter {
 		}
 	}
 
-	void ReleaseVBO() {
+	GLfloat deegressToRadians(GLfloat deegres) {
+		return deegres * 3.141592f / 180.0f;
 	}
 
-	glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(1.0f, 0.5f, 0.0f));
+	glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), yAngle, glm::vec3(1.0f, 0.5f, 0.0f));
 
-	void loadTexture(const char* texturePath, GLuint& textureID) {
-		int width, height, channels;
-		unsigned char* image = stbi_load(texturePath, &width, &height, &channels, STBI_rgb);
-
-		if (!image) {
-			std::cerr << "Failed to load texture: " << texturePath << std::endl;
-			return;
-		}
-
-		glGenTextures(1, &textureID);
-		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		stbi_image_free(image);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	}
-	std::vector<GLuint> indices;
 public:
 	Painter(PainterState& painterState) : state(painterState) {}
 
 	PainterState state;
 
-	GLfloat angle = 0.0f;
-
-	void loadModel(const std::string& path) {
-
-		numTextures = 0;
-		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
-
-		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-			std::cerr << "Error loading model: " << importer.GetErrorString() << std::endl;
-			return;
-		}
-
-		int count = 0;
-
-		std::string modelDirectory = path;
-		modelDirectory = modelDirectory.substr(0, modelDirectory.find_last_of('\\'));
-
-		for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
-
-
-			aiMesh* mesh = scene->mMeshes[i];
-
-			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-
-			for (unsigned int j = 0; j < AI_TEXTURE_TYPE_MAX; ++j) {
-				aiTextureType textureType = static_cast<aiTextureType>(j);
-				aiString texturePath;
-
-				if (material->GetTexture(textureType, 0, &texturePath) == AI_SUCCESS) {
-					std::string fullPath = modelDirectory + '\\' + texturePath.C_Str();
-					GLuint textureID;
-					loadTexture(fullPath.c_str(), textureID);
-					
-					textures[numTextures++] = textureID;
-				}
-			}
-
-			count += mesh->mNumVertices;
-
-			glGenVertexArrays(1, &VAO);
-			glGenBuffers(1, &VBO);
-
-			glBindVertexArray(VAO);
-
-			for (unsigned int j = 0; j < mesh->mNumFaces; ++j) {
-				aiFace face = mesh->mFaces[j];
-
-				for (unsigned int k = 0; k < face.mNumIndices; ++k) {
-					indices.push_back(face.mIndices[k]);
-				}
-			}
-
-			GLuint EBO;
-			glGenBuffers(1, &EBO);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
-
-			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(aiVector3D) * mesh->mNumVertices, &mesh->mVertices[0], GL_STATIC_DRAW);
-
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-			glEnableVertexAttribArray(0);
-
-			if (mesh->HasTextureCoords(0)) {
-				GLuint textureVBO;
-				glGenBuffers(1, &textureVBO);
-				glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
-				glBufferData(GL_ARRAY_BUFFER, sizeof(aiVector3D) * mesh->mNumVertices, &mesh->mTextureCoords[0][0], GL_STATIC_DRAW);
-
-				glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-				glEnableVertexAttribArray(1);
-			}
-
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-			glBindVertexArray(0);
-		}
-		numVertices = count;
-	}
-
+	GLuint sateliteNum = 10;
+	GLfloat yAngle = 0.0f;
+	GLfloat baseOrbitDeegre = 0.0f;
+	GLfloat orbitRadius = 5.0f;
 
 	void Draw() {
 		glEnable(GL_DEPTH_TEST);
-
-		GLint currentAttrib;
 		glUseProgram(Programs[0]);
-
-		glUniform1i(glGetUniformLocation(Programs[0], "numTextures"), numTextures);
-
-		for (int i = 0; i < numTextures; ++i) {
-			glActiveTexture(GL_TEXTURE0 + i);
-			glBindTexture(GL_TEXTURE_2D, textures[i]);
-			glUniform1i(glGetUniformLocation(Programs[0], ("textures[" + std::to_string(i) + "]").c_str()), i);
+		yAngle += 0.005;
+		baseOrbitDeegre += 1;
+		glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.02f));
+		rotationMatrix = glm::rotate(glm::mat4(1.0f), yAngle, glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 centralModel = scaleMatrix * rotationMatrix * glm::rotate(glm::mat4(1.0f), deegressToRadians(90), glm::vec3(-1.0f, 0.0f, 0.0f));
+		if (state.centralModel != nullptr) {
+			(state.centralModel->Draw(Programs[0], centralModel, state.camera.getViewMatrix(), state.camera.getProjectionMatrix()));
 		}
+		glm::vec3 satelitePosition(orbitRadius, 0.0f, 0.0f);
+		if (state.satelliteModel != nullptr) {
+			glm::vec3 position(orbitRadius, 0.0f, 0.0f);
+			GLfloat deegreeStep = 360 / sateliteNum;
 
-		angle += 0.005;
-		rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(1.0f, 0.5f, 0.0f));
-		auto viewMatrix = state.camera.getViewMatrix();
-		auto projectionMatrix = state.camera.getProjectionMatrix();
-		glBindVertexArray(VAO);
-		glUniformMatrix4fv(glGetUniformLocation(Programs[0], "model"), 1, GL_FALSE, glm::value_ptr(rotationMatrix));
-		glUniformMatrix4fv(glGetUniformLocation(Programs[0], "view"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
-		glUniformMatrix4fv(glGetUniformLocation(Programs[0], "projection"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-
-
-		glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
+			for (int i = 0; i < sateliteNum; ++i)
+			{
+				glm::mat4 sateliteModel = scaleMatrix * rotationMatrix * glm::rotate(glm::mat4(1.0f), deegressToRadians(90), glm::vec3(-1.0f, 0.0f, 0.0f));
+				glm::mat4 orbitMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(baseOrbitDeegre + i * deegreeStep), glm::vec3(0.0f, 1.0f, 0.0f));
+				glm::mat4 translateMatrix = glm::translate(glm::mat4(1.0f), position);
+				sateliteModel = orbitMatrix * translateMatrix * sateliteModel;
+				(state.satelliteModel->Draw(Programs[0], sateliteModel, state.camera.getViewMatrix(), state.camera.getProjectionMatrix()));
+			}
+		}
 
 		glUseProgram(0);
 	}
@@ -369,12 +203,10 @@ public:
 	void Init() {
 		glewInit();
 		InitShader();
-		InitVBO();
 	}
 
 	void Release() {
 		ReleaseShader();
-		ReleaseVBO();
 	}
 
 };
